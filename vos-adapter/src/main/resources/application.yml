@@ -1,0 +1,62 @@
+# spring_config
+spring:
+  profiles:
+    active: dev
+#debug: true
+# server_config
+server:
+  port: 80
+  session-timeout: 1
+  tomcat.max-threads: 0
+  tomcat.uri-encoding: UTF-8
+# log_config
+logging:
+  config:
+    classpath: log4j2.xml
+  level:
+    root: info
+# jdbc_config   datasource
+#spring:
+#  datasource:
+#    driver-class-name: com.mysql.jdbc.Driver
+#    url: jdbc:mysql://10.199.211.40:3306/backend_log?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true&useSSL=false&zeroDateTimeBehavior=convertToNull
+#    username: nlp_dev
+#    password: nlp_dev123
+# Hikari will use the above plus the following to setup connection pooling
+#    type: com.zaxxer.hikari.HikariDataSource
+#  hikari:
+#    minimum-idle: 5
+#    maximum-pool-size: 15
+#    auto-commit: true
+#    idle-timeout: 30000
+#    pool-name: DatebookHikariCP
+#    max-lifetime: 1800000
+#    connection-timeout: 30000
+#    connection-test-query: SELECT 1
+
+
+
+
+
+
+
+
+
+
+
+
+
+# db
+#druid.url=jdbc:mysql://10.199.211.40:3306/backend_log
+#druid.driver-class=com.mysql.jdbc.Driver
+#druid.username=nlp_dev
+#druid.password=nlp_dev123
+#druid.initial-size=1
+#druid.min-idle=1
+#druid.max-active=20
+#druid.constants-on-borrow=true
+
+
+#logging.level.org.hibernate.SQL=INFO
+##logging.level.org.hibernate.type.descriptor.sql.BasicBinder=INFO
+##logging.level.com.concretepage= INFO
