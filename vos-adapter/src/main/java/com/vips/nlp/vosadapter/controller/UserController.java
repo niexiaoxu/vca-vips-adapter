@@ -32,7 +32,7 @@ public class UserController {
         List<User> r = new ArrayList<User>(users.values());
         log.info("GET");
         int i = 0;
-        while (i<10000000){
+        while (i<10){
             System.gc();
             log.info("gc..");
             i++;

@@ -3,12 +3,16 @@ package com.vips.nlp.vosadapter.utils.files;
 import lombok.extern.log4j.Log4j2;
 
 import java.io.*;
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
+import java.util.List;
 
 @Log4j2
 public class TestFiles {
-    public static void main(String[] args) throws FileNotFoundException, UnsupportedEncodingException {
+    public static void main(String[] args) throws InterruptedException {
 //        readAndWrite("/test/sjp2.csv", "/test/sjpt_2.csv");
-        readAndWrite("/test/sjpt_2.csv", "/test/mid_all_parse.csv","/test/diff.csv");
+//        Thread.sleep(15000);
+        readAndWrite("/test/sjpt_2.csv", "/test/mid_all_parse.csv", "/test/diff.csv");
     }
 
     /**
@@ -20,16 +24,16 @@ public class TestFiles {
     public static void readAndWrite(String readFilePath, String writeFilePath) {
         String encoding = "UTF-8";
         File readFile = new File(readFilePath);
-        if(!checkReadFile(readFile)){
+        if (!checkReadFile(readFile)) {
             return;
         }
         File writeFile = new File(writeFilePath);
-        try(FileInputStream fileInputStream = new FileInputStream(readFile);
-                InputStreamReader inputStreamReader = new InputStreamReader(fileInputStream, encoding);
-                BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
-                FileOutputStream fileOutputStream = new FileOutputStream(writeFile);
-                OutputStreamWriter outputStreamWriter = new OutputStreamWriter(fileOutputStream, encoding);
-                BufferedWriter bufferedWriter = new BufferedWriter(outputStreamWriter)){
+        try (FileInputStream fileInputStream = new FileInputStream(readFile);
+             InputStreamReader inputStreamReader = new InputStreamReader(fileInputStream, encoding);
+             BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+             FileOutputStream fileOutputStream = new FileOutputStream(writeFile);
+             OutputStreamWriter outputStreamWriter = new OutputStreamWriter(fileOutputStream, encoding);
+             BufferedWriter bufferedWriter = new BufferedWriter(outputStreamWriter)) {
             String lineTxt = null;
             int count = 0;
             while ((lineTxt = bufferedReader.readLine()) != null) {
@@ -38,19 +42,20 @@ public class TestFiles {
                 bufferedWriter.write(lineTxt);
                 count++;
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             log.error("读写异常，错误信息：{}", e.getMessage());
         }
     }
 
     /**
-     *  查看文件可读性
+     * 查看文件可读性
+     *
      * @param file
      * @return
      */
-    private static boolean checkReadFile(File file){
+    private static boolean checkReadFile(File file) {
         boolean result = true;
-        if(!file.isFile() || !file.exists() || !file.canRead()){
+        if (!file.isFile() || !file.exists() || !file.canRead()) {
             log.error("当前文件状态, isFile:{}, exists:{}, canRead:{}", new Object[]{file.isFile(), file.exists(), file.canRead()});
             result = false;
         }
@@ -61,51 +66,94 @@ public class TestFiles {
 
     /**
      * 比较并记录源文件与目标文件的差异部分
+     *
      * @param sourceFilePath 源文件
      * @param targetFilePath 目标文件
-     * @param diffFilePath 差异文件
+     * @param diffFilePath   差异文件
      */
     public static void readAndWrite(String sourceFilePath, String targetFilePath, String diffFilePath) {
+        long start = System.currentTimeMillis();
         String encoding = "UTF-8";
         File sourceFile = new File(sourceFilePath);
         File targetFile = new File(targetFilePath);
-        if(!checkReadFile(sourceFile) || !checkReadFile(targetFile)){
+        if (!checkReadFile(sourceFile) || !checkReadFile(targetFile)) {
             return;
         }
-        File writeFile = new File(diffFilePath);
-        try(FileInputStream sourcefileInputStream = new FileInputStream(sourceFile);
-            InputStreamReader sourceinputStreamReader = new InputStreamReader(sourcefileInputStream, encoding);
-            BufferedReader sourcebufferedReader = new BufferedReader(sourceinputStreamReader);
-            FileInputStream targetFilefileInputStream = new FileInputStream(targetFile);
-            InputStreamReader targetFileinputStreamReader = new InputStreamReader(targetFilefileInputStream, encoding);
-            BufferedReader targetFilebufferedReader = new BufferedReader(targetFileinputStreamReader);
-            FileOutputStream fileOutputStream = new FileOutputStream(writeFile);
-            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(fileOutputStream, encoding);
-            BufferedWriter bufferedWriter = new BufferedWriter(outputStreamWriter)){
+        //init read
+        FileInputStream sourcefileInputStream = null;
+        InputStreamReader sourceinputStreamReader = null;
+        BufferedReader sourcebufferedReader = null;
+        //init write
+        FileOutputStream fileOutputStream = null;
+        OutputStreamWriter outputStreamWriter = null;
+        BufferedWriter bufferedWriter = null;
+        try {
+            //source
+            sourcefileInputStream = new FileInputStream(sourceFile);
+            sourceinputStreamReader = new InputStreamReader(sourcefileInputStream, encoding);
+            sourcebufferedReader = new BufferedReader(sourceinputStreamReader);
             String slineTxt = null;
-            int scount = 0;
-            String tlinTxt = null;
-            int tcount = 0;
+            LinkedHashSet<String> sourceSet = new LinkedHashSet<>();
             while ((slineTxt = sourcebufferedReader.readLine()) != null) {
-                while ((tlinTxt = targetFilebufferedReader.readLine()) != null) {
-                    if(scount==1 || (scount>0 && tcount==0)){
-                        break;
-                    }
-                    if(slineTxt.equals(tlinTxt)){
-                        log.error("当前相同：源数据：{} 源行数：{}, 目标数据：{} 目标行数：{}", new Object[]{slineTxt, scount, tlinTxt, tcount});
-                        slineTxt = "\"" + slineTxt + "\"\r\n";
-                        bufferedWriter.write(slineTxt);
-                        bufferedWriter.flush();
-                    }else{
-                        log.error("当前差异：源数据：{} 源行数：{}, 目标数据：{} 目标行数：{}", new Object[]{slineTxt, scount, tlinTxt, tcount});
-                    }
-                    tcount++;
-                }
-                scount++;
+                sourceSet.add(slineTxt);
             }
-        }catch (Exception e){
-            log.error("读写异常，错误信息：{}", e.getMessage());
+            //target
+            LinkedHashSet<String> targetSet = new LinkedHashSet<>();
+            sourcefileInputStream = new FileInputStream(targetFile);
+            sourceinputStreamReader = new InputStreamReader(sourcefileInputStream, encoding);
+            sourcebufferedReader = new BufferedReader(sourceinputStreamReader);
+            while ((slineTxt = sourcebufferedReader.readLine()) != null) {
+                targetSet.add(slineTxt);
+            }
+            //write
+            File writeFile = new File(diffFilePath);
+            fileOutputStream = new FileOutputStream(writeFile);
+            outputStreamWriter = new OutputStreamWriter(fileOutputStream, encoding);
+            bufferedWriter = new BufferedWriter(outputStreamWriter);
+            int scount = 0;
+            for (String smid : sourceSet) {
+                scount++;
+                int tcount = 0;
+                for (String tmid : targetSet) {
+                    tcount++;
+                    if (smid.equals(tmid)) {
+                        log.info("相同： mid：{}, 源行数：{}, 目标行数：{}", new Object[]{smid, scount, tcount});
+                        bufferedWriter.write(smid + "\r\n");
+                        bufferedWriter.flush();
+                        continue;
+                    } else {
+                        log.warn("差异： mid：{}, 源行数：{}, 目标行数：{}", new Object[]{smid, scount, tcount});
+                    }
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.error("读写失败，错误信息：{}", e.getMessage());
+        } finally {
+            try {
+                bufferedWriter.close();
+                outputStreamWriter.close();
+                fileOutputStream.close();
+                sourcebufferedReader.close();
+                sourceinputStreamReader.close();
+                sourcefileInputStream.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+                log.error("关闭流失败，错误信息：{}", e.getMessage());
+            }
         }
-        log.info("finsh...");
+        long end = System.currentTimeMillis();
+        log.info("执行完毕，耗时：{}", end - start);
+    }
+
+    /**
+     * 去重
+     * @param list
+     */
+    private static void removeDuplicate(List<String> list) {
+        LinkedHashSet<String> set = new LinkedHashSet<String>(list.size());
+        set.addAll(list);
+        list.clear();
+        list.addAll(set);
     }
 }
