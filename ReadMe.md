@@ -6,7 +6,7 @@
 ### 1.1 vos-adapter
 #### 1.1.1 简介
 ```
-VOS存储服务系统
+ VOS代理服务后台
 ```
 #### 1.1.2 工程说明
 ```
@@ -29,5 +29,22 @@ VOS存储服务系统
     
 - 接口文档
     
+```
+#### 1.1.2 工具类简介
+#### 1.1.2.1 TestFiles CSV文本处理
+##### 1.1.2.1.1 JVM配置
+```
+-Xms1024m
+-Xmx1024m
+-XX:ThreadStackSize=128m
+-XX:MetaspaceSize=50m
+-XX:MaxMetaspaceSize=2048m
+-verbose:gc
+-XX:+PrintGC
+-XX:+PrintGCDetails
+-XX:+PrintHeapAtGC
+-XX:+PrintGCTimeStamps
+-Xloggc:/test/logs/gc.log
+-XX:-TraceClassResolution
 ```
 

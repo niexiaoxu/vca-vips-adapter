@@ -20,12 +20,12 @@ public class TestFiles {
     }
 
     /**
-     * 读写文件
+     * 读文件格式化输出文件（"\"" + content + "\"\r\n"）
      *
      * @param readFilePath  读取文件路径
      * @param writeFilePath 写入文件路径
      */
-    public static void readAndFormatWrite(String readFilePath, String writeFilePath) {
+    private static void readAndFormatWrite(String readFilePath, String writeFilePath) {
         String encoding = "UTF-8";
         File readFile = new File(readFilePath);
         if (!checkReadFile(readFile)) {
@@ -53,7 +53,7 @@ public class TestFiles {
 
 
     /**
-     * 比较并记录源文件与目标文件的差异部分
+     * 提取源.CSV文件与目标.CSV文件交集行数，并写入新的.CVS文件
      *
      * @param sourceFilePath 源文件
      * @param targetFilePath 目标文件
