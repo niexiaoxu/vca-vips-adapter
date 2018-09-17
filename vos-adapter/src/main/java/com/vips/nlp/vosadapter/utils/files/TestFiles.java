@@ -1,6 +1,5 @@
 package com.vips.nlp.vosadapter.utils.files;
 
-import com.vips.nlp.vosadapter.utils.validate.CheckValue;
 import lombok.extern.log4j.Log4j2;
 
 import java.io.*;
@@ -16,7 +15,7 @@ public class TestFiles {
     public static void main(String[] args) throws InterruptedException {
 //        readAndFormatWrite("/test/sjp2.csv", "/test/sjpt_2.csv");
 //        Thread.sleep(15000);
-        readAndWrite("/test/sjpt_2.csv", "/test/mid_all_parse.csv", "/test/diff.csv");
+        readAndWrite("/test/sjpt_2.1.csv", "/test/mid_all_parse.csv", "/test/diff.csv");
     }
 
     /**
@@ -81,7 +80,7 @@ public class TestFiles {
                         bufferedWriter.write(smid + "\r\n");
                         bufferedWriter.flush();
                         containsCount++;
-                        continue;
+                        break;
                     } else {
                         log.warn("差异： mid：{}, 源行数：{}, 目标行数：{}", new Object[]{smid, scount, tcount});
                     }
