@@ -3,6 +3,7 @@ package com.vips.nlp.vosadapter.utils.files;
 import lombok.extern.log4j.Log4j2;
 
 import java.io.*;
+import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 
@@ -12,10 +13,9 @@ public class TestFiles {
     public static final LinkedHashSet<String> sourceSet = new LinkedHashSet<>();
     public static final LinkedHashSet<String> targetSet = new LinkedHashSet<>();
 
-    public static void main(String[] args) throws InterruptedException {
+    public static void main(String[] args) {
 //        readAndFormatWrite("/test/sjp2.csv", "/test/sjpt_2.csv");
-//        Thread.sleep(15000);
-        readAndWrite("/test/sjpt_2.csv", "/test/mid_all_parse.csv", "/test/diff.csv");
+        readAndWrite("/test/v1/source.csv", "/test/v1/target.csv", "/test/v1/diff.csv");
     }
 
     /**
@@ -71,20 +71,27 @@ public class TestFiles {
             getLinkedHashSet(targetSet, targetFilePath, encoding);
             int scount = 0;
             for (String smid : sourceSet) {
-                scount++;
-                int tcount = 0;
-                for (String tmid : targetSet) {
-                    tcount++;
-                    if (smid.equals(tmid)) {
-                        log.info("相同： mid：{}, 源行数：{}, 目标行数：{}", new Object[]{smid, scount, tcount});
-                        bufferedWriter.write(smid + "\r\n");
-                        bufferedWriter.flush();
-                        containsCount++;
-                        break;
-                    } else {
-                        log.warn("差异： mid：{}, 源行数：{}, 目标行数：{}", new Object[]{smid, scount, tcount});
+                if (scount != 0) {
+                    int tcount = 0;
+                    for (String tmid : targetSet) {
+                        if (tcount != 0) {
+                            if (containsCount % 200 == 0) {
+                                bufferedWriter.flush();
+                            }
+                            if (tmid.contains(smid)) {
+                                log.info("相同： mid：{}, 源行数：{}, 目标行数：{}", new Object[]{smid, scount, tcount});
+                                bufferedWriter.write(tmid);
+                                bufferedWriter.newLine();
+                                containsCount++;
+                                break;
+                            } else {
+                                log.warn("差异： mid：{}, 源行数：{}, 目标行数：{}, 目标内容：{}", new Object[]{smid, scount, tcount, tmid});
+                            }
+                        }
+                        tcount++;
                     }
                 }
+                scount++;
             }
             long end = System.currentTimeMillis();
             log.info("执行完毕，耗时：{}, 相同总数：{}", new Object[]{(end - start), containsCount});
@@ -135,6 +142,30 @@ public class TestFiles {
             log.error("读取文件转LinkedHashSet异常，错误信息：{}", e.getMessage());
         }
         return linkedHashSet;
+    }
+
+    /**
+     * 集合数据写文件
+     *
+     * @param filePath 文件路径
+     * @param sets     数据集合
+     * @param encoding 编码
+     */
+    public static void listToFile(String filePath, LinkedHashSet<String> sets, String encoding) {
+        File writeFile = new File(filePath);
+        try (FileOutputStream fileOutputStream = new FileOutputStream(writeFile);
+             OutputStreamWriter outputStreamWriter = new OutputStreamWriter(fileOutputStream, encoding);
+             BufferedWriter bufferedWriter = new BufferedWriter(outputStreamWriter)) {
+            for (String str : sets) {
+                bufferedWriter.write(str);
+                bufferedWriter.newLine();
+                bufferedWriter.flush();
+            }
+            log.info("数据写入文件， 长度：{}， 路径：{}", new Object[]{sets.size(), filePath});
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.error("数据写入文件失败，错误信息：{}", e.getMessage());
+        }
     }
 
     /**
