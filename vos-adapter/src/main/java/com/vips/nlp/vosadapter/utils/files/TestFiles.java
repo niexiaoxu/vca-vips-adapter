@@ -15,7 +15,7 @@ public class TestFiles {
     public static void main(String[] args) throws InterruptedException {
 //        readAndFormatWrite("/test/sjp2.csv", "/test/sjpt_2.csv");
 //        Thread.sleep(15000);
-        readAndWrite("/test/sjpt_2.1.csv", "/test/mid_all_parse.csv", "/test/diff.csv");
+        readAndWrite("/test/sjpt_2.csv", "/test/mid_all_parse.csv", "/test/diff.csv");
     }
 
     /**
@@ -80,14 +80,14 @@ public class TestFiles {
                         bufferedWriter.write(smid + "\r\n");
                         bufferedWriter.flush();
                         containsCount++;
-                        break;
+//                        break;
                     } else {
                         log.warn("差异： mid：{}, 源行数：{}, 目标行数：{}", new Object[]{smid, scount, tcount});
                     }
                 }
             }
             long end = System.currentTimeMillis();
-            log.info("执行完毕，耗时：{}, 相同总数：{}", new Object[]{containsCount, (end - start)});
+            log.info("执行完毕，耗时：{}, 相同总数：{}", new Object[]{(end - start), containsCount});
         } catch (Exception e) {
             e.printStackTrace();
             log.error("读写失败，错误信息：{}", e.getMessage());

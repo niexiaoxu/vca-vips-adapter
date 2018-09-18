@@ -14,7 +14,7 @@ logging:
   config:
     classpath: log4j2.xml
   level:
-    root: info
+    root: debug
 # jdbc_config   datasource
 #spring:
 #  datasource:
