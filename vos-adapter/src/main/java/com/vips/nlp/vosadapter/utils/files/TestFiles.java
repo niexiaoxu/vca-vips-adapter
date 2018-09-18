@@ -19,7 +19,7 @@ public class TestFiles {
     }
 
     /**
-     * 读文件格式化输出文件（"\"" + content + "\"\r\n"）
+     * 按行读文件，并格式化输出文件（"\"" + content + "\"\r\n"）
      *
      * @param readFilePath  读取文件路径
      * @param writeFilePath 写入文件路径
@@ -80,7 +80,7 @@ public class TestFiles {
                         bufferedWriter.write(smid + "\r\n");
                         bufferedWriter.flush();
                         containsCount++;
-//                        break;
+                        break;
                     } else {
                         log.warn("差异： mid：{}, 源行数：{}, 目标行数：{}", new Object[]{smid, scount, tcount});
                     }
